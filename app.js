@@ -2,6 +2,7 @@ const express = require("express")
 const session = require("express-session")
 const cors = require("cors")
 const MongoStore = require("connect-mongo")
+const cookieParser = require("cookie-parser")
 
 const app = express()
 
@@ -13,16 +14,22 @@ app.use(
 );
 
 app.use(express.json())
+app.use(cookieParser())
 
 app.use(session({
     secret: "secret",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: 'mongodb://127.0.0.1:27017/myDatabase', collectionName: "session", }),
     cookie: {
-        maxAge: 100000,
+        maxAge: 3600000
     }
 }));
+
+// app.use("/", (req, res, next) => {
+//     console.log(req.session)
+//     next()
+// })
 
 app.use("/users", require("./Routes/usersRoute"))
 
