@@ -14,6 +14,16 @@ const getUsers = async (req, res, next) => {
     res.status(200).json(data)
 } 
 
+const logoutUser = (req, res, next) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).json({message: err})
+        } else {
+            res.status(200).json({message: "Logout Successful"})
+        }
+    })
+}
+
 const sessionLogin = async (req, res, next) => {
     const email_address = req.session.email_address
     const password = req.session.password
@@ -98,7 +108,7 @@ const deleteUser = (req, res, next) => {
     res.send("delete")
 }
 
-module.exports = { getUser, getUsers, postUser, loginUser, patchUser, deleteUser, sessionLogin}
+module.exports = { getUser, getUsers, postUser, loginUser, patchUser, deleteUser, sessionLogin, logoutUser}
 
 // const getUsers = async (req, res, next) => {
 //     const data = await User.findAll({
