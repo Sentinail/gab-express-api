@@ -1,9 +1,23 @@
-const { User } = require("../Databases/MySQL_Model/user_datas_model")
+const { User } = require("../Databases/MySQL_Model/users_model")
 const { Sequelize, Op } = require("sequelize")
 const bcrypt = require("bcrypt")
+const multer = require('multer');
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, "./Images/Gab-Express-User-Profile")
+    },
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      cb(null, uniqueSuffix + '-' + file.originalname);
+    }
+  });
+  
+const upload = multer({ storage: storage }).single("image")
 
 const getUser = async (req, res, next) => {
+    
     const data = await User.findOne({where: {user_id: req.params.search}, attributes: {exclude: "password"}})
+    console.log(data)
     res.status(200).json(data)
 }
 
@@ -100,15 +114,25 @@ const loginUser = async (req, res, next) => {
     }
 }
 
-const patchUser = (req, res, next) => {
-    res.send("patch")
+const patchUser = async (req, res, next) => {
+
+    const result = User.update({
+        user_profile_name: req.file.filename,
+        about_user: req.body.about_user
+    }, {
+        where: {
+            user_id: req.session.user_id
+        }
+    })
+
+    res.send("result successs")
 }
 
 const deleteUser = (req, res, next) => {
     res.send("delete")
 }
 
-module.exports = { getUser, getUsers, postUser, loginUser, patchUser, deleteUser, sessionLogin, logoutUser}
+module.exports = { upload, getUser, getUsers, postUser, loginUser, patchUser, deleteUser, sessionLogin, logoutUser}
 
 // const getUsers = async (req, res, next) => {
 //     const data = await User.findAll({

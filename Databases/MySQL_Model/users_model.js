@@ -40,11 +40,18 @@ const User = sequelize.define('user_datas', {
         type: DataTypes.DATE
     },
     total_donation: {
-        type: DataTypes.DECIMAL
+        type: DataTypes.DECIMAL,
+        defaultValue: 0
     },
     about_user: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        defaultValue: "Lorem Ipsum"
+    },
+    user_profile_name: {
+        type: DataTypes.STRING,
+        defaultValue: "Default_profile_pict.png"
     }
+
 }, {
     tableName: "user_datas",
     timestamps: false
