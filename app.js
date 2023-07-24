@@ -3,10 +3,11 @@ const session = require("express-session")
 const cors = require("cors")
 const MongoStore = require("connect-mongo")
 const cookieParser = require("cookie-parser")
+require("dotenv").config()
 
 const app = express()
 
-app.use(cors({origin: ["http://localhost:3000"], credentials: true}))
+app.use(cors({origin: [process.env.CLIENT_SIDE_URL], credentials: true}))
 
 app.options('*', cors());
 
@@ -24,12 +25,9 @@ app.use(session({
     }
 }));
 
-// app.use("/", (req, res, next) => {
-//     console.log(req.session)
-//     next()
-// })
+app.use("/users", require("./Routes/users-route"))
 
-app.use("/users", require("./Routes/usersRoute"))
+app.use("/create-checkout-session", require("./Routes/checkout-route"))
 
 app.use("*", (req, res, next) => {
     res.send("404")
