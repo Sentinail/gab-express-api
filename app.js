@@ -4,6 +4,7 @@ const cors = require("cors")
 const MongoStore = require("connect-mongo")
 const cookieParser = require("cookie-parser")
 require("dotenv").config()
+const { webHook } = require("./Controllers/stripeWebhookController")
 
 const app = express()
 
@@ -11,9 +12,13 @@ app.use(cors({origin: [process.env.CLIENT_SIDE_URL], credentials: true}))
 
 app.options('*', cors());
 
+app.post('/webhook', express.raw({type: 'application/json'}), webHook)
+
 app.use(express.json())
+
 app.use(cookieParser())
-app.use("/user-images", express.static("Images/Gab-Express-User-Profile"))    
+
+app.use("/user-images", express.static("Images/Gab-Express-User-Profile"))   
 
 app.use(session({
     secret: "secret",
@@ -33,6 +38,8 @@ app.use("*", (req, res, next) => {
     res.send("404")
 })
 
-app.listen(9000, () => {
-    console.log("listening on Port: 9000")
+const port = 9000
+
+app.listen(port, () => {
+    console.log(`Listening on Port: ${port}`)
 })

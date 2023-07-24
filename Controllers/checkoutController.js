@@ -10,33 +10,37 @@ const storeItems = new Map(
   
 
 const createCheckout = async (req, res, next) => {
-    try {
-        const data = req.body.item
-        const session = await stripe.checkout.sessions.create({
-          payment_method_types: ['card'],
-          mode: 'payment',
-          line_items: 
-          [
-            {
-              price_data: {
-                currency: 'usd',
-                product_data: {
-                  name: storeItems.get(data.id).name
-                },
-                unit_amount: storeItems.get(data.id).priceInCents
-              },
-              quantity: data.quantity
-            }
-          ],
-          success_url: `${process.env.CLIENT_SIDE_URL}/home`,
-          cancel_url: `${process.env.CLIENT_SIDE_URL}/home`,
-  
-        })
-        res.json({ url: session.url });
-      } catch (e) {
-          console.log(e.message)
-          res.status(500).json({error: e.message})
-      }
-}
+  try {
+    const data = req.body.item;
+    const customer = await stripe.customers.create({
+      email: req.session.email_address, // Assuming you have the email in the request body
+    });
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: storeItems.get(data.id).name,
+            },
+            unit_amount: storeItems.get(data.id).priceInCents,
+          },
+          quantity: data.quantity,
+        },
+      ],
+      success_url: `${process.env.CLIENT_SIDE_URL}/home`,
+      cancel_url: `${process.env.CLIENT_SIDE_URL}/home`,
+      customer: customer.id, // Attach the customer ID to the payment intent
+    });
+
+    res.json({ url: session.url });
+  } catch (e) {
+    console.log(e.message);
+    res.status(500).json({ error: e.message });
+  }
+};
 
 module.exports = { createCheckout }
