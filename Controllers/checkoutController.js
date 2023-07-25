@@ -1,13 +1,12 @@
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY)
 
 const storeItems = new Map(
-    [
-      [1 , {priceInCents: 500, name: "Item 1"}],
-      [2 , {priceInCents: 1000, name: "Item 2"}],
-      [3 , {priceInCents: 200, name: "Item 3"}],
-      [4 , {priceInCents: 700, name: "Item 4"}],
-    ])
-  
+  [
+    [1 , {priceInCents: 500, name: "Item 1"}],
+    [2 , {priceInCents: 1000, name: "Item 2"}],
+    [3 , {priceInCents: 200, name: "Item 3"}],
+    [4 , {priceInCents: 700, name: "Item 4"}],
+  ])
 
 const createCheckout = async (req, res, next) => {
   try {
