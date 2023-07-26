@@ -18,10 +18,6 @@ app.use(express.json())
 
 app.use(cookieParser())
 
-app.use("/user-images", express.static("Images/Gab-Express-User-Profile"))
-
-app.use("/food-item-images", express.static("Images/Gab-Express-Food-Items"))
-
 app.use(session({
     secret: "secret",
     resave: false,
@@ -38,6 +34,12 @@ app.use(session({
 
 app.enable("trust proxy")
 
+
+
+app.use("/user-images", express.static("Images/Gab-Express-User-Profile"))
+
+app.use("/food-item-images", express.static("Images/Gab-Express-Food-Items"))
+
 app.use("/users", require("./Routes/users-route"))
 
 app.use("/items", require("./Routes/items-route"))
@@ -45,6 +47,12 @@ app.use("/items", require("./Routes/items-route"))
 app.use("/create-checkout-session", require("./Routes/checkout-route"))
 
 app.use("/transactions", require("./Routes/get-transactions-route"))
+
+app.use("/home-page-of-this-uhmmmm-api-i-guess", express.static("Public"))
+
+app.get("/", (req, res) => {
+    res.redirect("home-page-of-this-uhmmmm-api-i-guess")
+})
 
 app.use("*", (req, res, next) => {
     res.send("404")
