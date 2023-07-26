@@ -1,6 +1,7 @@
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const endpointSecret = "whsec_d0c2180ff74ea5f0f4d0f1cbe726a785eb0d23425712a25f24440c1c931b6d9c";
 const { User } = require("../Databases/MySQL_Model/users_model")
+const { Transaction } = require("../Databases/MySQL_Model/transactions_model")
 
 const webHook = async (request, response) => {
   const sig = request.headers['stripe-signature'];
@@ -22,7 +23,21 @@ const webHook = async (request, response) => {
 
       // Retrieve the customer details using the customer ID from the payment intent
       const customer = await stripe.customers.retrieve(paymentIntentSucceeded.customer);
-      console.log("Costumer:" + customer.email)
+      console.log("Costumer:" + customer)
+
+      // Access the metadata from the Payment Intent
+      const {item_name, quantity, price, place_to_deliver} = paymentIntentSucceeded.metadata;
+      if (item_name && quantity && price && place_to_deliver) {
+        const transaction_result = await Transaction.create({
+          item_name: item_name,
+          quantity: quantity,
+          price: price,
+          customer_email: customer.email,
+          donation_place: place_to_deliver
+        })
+
+        console.log(transaction_result)
+      }
 
       const user = await User.findOne({where: {email_address: customer.email}})
       console.log("User:" + user.email_address)

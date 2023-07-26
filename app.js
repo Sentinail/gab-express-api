@@ -44,6 +44,8 @@ app.use("/items", require("./Routes/items-route"))
 
 app.use("/create-checkout-session", require("./Routes/checkout-route"))
 
+app.use("/transactions", require("./Routes/get-transactions-route"))
+
 app.use("*", (req, res, next) => {
     res.send("404")
 })
