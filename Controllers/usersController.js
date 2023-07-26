@@ -2,13 +2,15 @@ const { User } = require("../Databases/MySQL_Model/users_model")
 const { Sequelize } = require("sequelize")
 const bcrypt = require("bcrypt")
 const multer = require('multer');
+const fs = require('fs');
+const path = require('path');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, "./Images/Gab-Express-User-Profile")
     },
     filename: function (req, file, cb) {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-      cb(null, uniqueSuffix + '-' + file.originalname);
+        const uniqueSuffix = req.session.email_address + '-' + Date.now() + '-' + Math.round(Math.random() * 1e9);
+        cb(null, uniqueSuffix + '-' + file.originalname);
     }
   });
   
@@ -139,6 +141,50 @@ const loginUser = async (req, res, next) => {
 }
 
 const patchUser = async (req, res, next) => {
+    const email_address = req.session.email_address;
+
+    const emailRegex = new RegExp(`^${email_address.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}-\\d+-(\\d+)-(.+)$`, 'i');
+
+    const folderPath = path.join(__dirname, '../', 'Images', 'Gab-Express-User-Profile');
+
+    fs.readdir(folderPath, (err, files) => {
+        if (err) {
+        console.error('Error reading folder:', err);
+        return res.status(500).send('Error reading folder');
+        }
+
+        const matchingFiles = files.filter((file) => emailRegex.test(file));
+
+        if (matchingFiles.length === 0) {
+        return res.status(404).send('Image not found');
+        }
+
+        // Sort the matching files by modification time in descending order (newest to oldest)
+        matchingFiles.sort((a, b) => {
+        const aPath = path.join(folderPath, a);
+        const bPath = path.join(folderPath, b);
+        return fs.statSync(bPath).mtime.getTime() - fs.statSync(aPath).mtime.getTime();
+        });
+
+        console.log(matchingFiles)
+
+        // Get the filename of the latest (most recent) image
+        const latestImage = matchingFiles[0];
+
+        // Delete all files in the folder except the latest one
+        matchingFiles.forEach((file) => {
+        if (file !== latestImage) {
+            const filePath = path.join(folderPath, file);
+            fs.unlink(filePath, (err) => {
+            if (err) {
+                console.error('Error deleting image:', err);
+                return res.status(500).send('Error deleting image');
+            }
+            });
+        }
+        });
+    });
+
     try {
         const result = User.update({
             user_profile_name: req.file.filename,
@@ -148,6 +194,7 @@ const patchUser = async (req, res, next) => {
                 user_id: req.session.user_id
             }
         })
+
         res.send("result successs")
     } catch (err) {
         res.status(400).json({message: err})
@@ -158,7 +205,7 @@ const deleteUser = (req, res, next) => {
     res.send("delete")
 }
 
-module.exports = { upload, getUser, getUsers, postUser, loginUser, patchUser, deleteUser, sessionLogin, logoutUser}
+module.exports = { upload, getUser, getUsers, postUser, loginUser, patchUser, deleteUser, sessionLogin, logoutUser }
 
 // const getUsers = async (req, res, next) => {
 //     const data = await User.findAll({

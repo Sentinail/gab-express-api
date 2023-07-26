@@ -18,6 +18,8 @@ app.use(express.json())
 
 app.use(cookieParser())
 
+app.use(express.urlencoded({ extended: true }));
+
 app.use(session({
     secret: "secret",
     resave: false,
@@ -34,11 +36,15 @@ app.use(session({
 
 app.enable("trust proxy")
 
+app.use(express.static("Images/Gab-Express-User-Profile"))
 
+app.use(express.static("Images/Gab-Express-Food-Items"))
 
-app.use("/user-images", express.static("Images/Gab-Express-User-Profile"))
+// app.use("/user-images", express.static("Images/Gab-Express-User-Profile"))
 
-app.use("/food-item-images", express.static("Images/Gab-Express-Food-Items"))
+// app.use("/food-item-images", express.static("Images/Gab-Express-Food-Items"))
+
+app.use("/images", require("./Routes/get-images-route"))
 
 app.use("/users", require("./Routes/users-route"))
 

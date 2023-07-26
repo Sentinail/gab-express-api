@@ -1,5 +1,5 @@
 const router = require("express").Router()
-const { upload, getUsers, getUser, postUser, loginUser, patchUser, deleteUser, sessionLogin, logoutUser } = require("../Controllers/usersController")
+const { upload, getUsers, getUser, postUser, loginUser, patchUser, deleteUser, sessionLogin, logoutUser, email_giver } = require("../Controllers/usersController")
 
 router.get("/", getUsers)
 
@@ -13,7 +13,7 @@ router.post("/", postUser)
 
 router.post("/login", loginUser)
 
-router.patch("/", upload, patchUser)
+router.post("/patch-user/", upload, patchUser)
 
 router.delete("/", deleteUser)
 
