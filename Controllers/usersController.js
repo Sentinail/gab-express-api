@@ -87,7 +87,7 @@ const postUser = async (req, res, next) => {
         const existingAccounts = await User.findOne({where: {email_address: email_address}})
 
         if (existingAccounts) {
-            res.status(400).json({created: false, message: "Account Already Exist"})
+            res.status(200).json({created: false, message: "Email Already Exist"})
 
         } else {
 
