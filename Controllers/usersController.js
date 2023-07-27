@@ -16,6 +16,14 @@ const storage = multer.diskStorage({
   
 const upload = multer({ storage: storage }).single("image")
 
+const checkUserAccount = async (req, res, next) => {
+    if (!req.session.email_address) {
+        res.json({isAuth : false})
+    } else {
+        res.json({isAuth : true})
+    }
+} 
+
 const getUser = async (req, res, next) => {
     try {
         const data = await User.findOne({where: {user_id: req.params.search}, attributes: {exclude: "password"}})
@@ -205,7 +213,7 @@ const deleteUser = (req, res, next) => {
     res.send("delete")
 }
 
-module.exports = { upload, getUser, getUsers, postUser, loginUser, patchUser, deleteUser, sessionLogin, logoutUser }
+module.exports = { upload, getUser, getUsers, postUser, loginUser, patchUser, deleteUser, sessionLogin, logoutUser, checkUserAccount}
 
 // const getUsers = async (req, res, next) => {
 //     const data = await User.findAll({

@@ -1,7 +1,9 @@
 const router = require("express").Router()
-const { upload, getUsers, getUser, postUser, loginUser, patchUser, deleteUser, sessionLogin, logoutUser, email_giver } = require("../Controllers/usersController")
+const { upload, getUsers, getUser, postUser, loginUser, patchUser, deleteUser, sessionLogin, logoutUser, checkUserAccount } = require("../Controllers/usersController")
 
 router.get("/", getUsers)
+
+router.get("/myaccount", checkUserAccount)
 
 router.get("/auth-session", sessionLogin)
 
