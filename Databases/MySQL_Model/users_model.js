@@ -50,8 +50,11 @@ const User = sequelize.define('user_datas', {
     user_profile_name: {
         type: DataTypes.STRING,
         defaultValue: "Default_profile_pict.png"
+    },
+    color_preference: {
+        type: DataTypes.STRING,
+        defaultValue: "[[47, 46, 46, 1], [75, 141, 193, 1], [242, 242, 242, 1]]"
     }
-
 }, {
     tableName: "user_datas",
     timestamps: false

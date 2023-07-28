@@ -17,7 +17,14 @@ const getUserImage = (req, res, next) => {
     const matchingFiles = files.filter((file) => emailRegex.test(file));
 
     if (matchingFiles.length === 0) {
-      return res.status(404).send('Image not found');
+      const defaultImagePath = path.join(__dirname, '../', 'Images', 'Gab-Express-User-Profile', 'Default_profile_pict.png');
+      const imageStream = fs.createReadStream(defaultImagePath);
+      imageStream.on('error', (err) => {
+        console.error('Error reading default image:', err);
+        res.status(500).send('Error reading default image');
+      });
+      res.writeHead(200, { 'Content-Type': 'image/*' });
+      return imageStream.pipe(res);
     }
 
     // Sort the matching files by modification time in descending order (newest to oldest)

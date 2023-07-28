@@ -16,6 +16,46 @@ const storage = multer.diskStorage({
   
 const upload = multer({ storage: storage }).single("image")
 
+const patchUserPreference = async (req, res, next) => {
+    try {
+        const email_address = req.session.email_address
+        const styleString = req.body.style
+
+        await User.update({color_preference: styleString}, {where: {email_address: email_address}})
+        res.send("Success")
+
+    } catch (err) {
+        res.send(err)
+    }
+    
+}
+
+const getUserPreference = async (req, res, next) => {
+    try {
+        const email_address = req.session.email_address
+        console.log(email_address)
+
+        if (email_address) {
+            const user = await User.findOne({ where: { email_address: email_address } });
+
+            const parsedStyleArray = JSON.parse(user.color_preference);
+
+            const primary_color = parsedStyleArray[0];
+            const secondary_color = parsedStyleArray[1];
+            const supporting_color = parsedStyleArray[2];
+
+            res.json({ primary_color, secondary_color, supporting_color });
+        } else {
+            res.json({ primary_color: [47, 46, 46, 1], secondary_color: [75, 141, 193, 1], supporting_color: [242, 242, 242, 1]});
+        }
+
+    } catch {
+        res.json({ primary_color: [47, 46, 46, 1], secondary_color: [75, 141, 193, 1], supporting_color: [242, 242, 242, 1]});
+    }
+    
+}
+
+
 const checkUserAccount = async (req, res, next) => {
     if (!req.session.email_address) {
         res.json({isAuth : false})
@@ -213,7 +253,7 @@ const deleteUser = (req, res, next) => {
     res.send("delete")
 }
 
-module.exports = { upload, getUser, getUsers, postUser, loginUser, patchUser, deleteUser, sessionLogin, logoutUser, checkUserAccount}
+module.exports = { upload, getUser, getUsers, postUser, loginUser, patchUser, deleteUser, sessionLogin, logoutUser, checkUserAccount, getUserPreference, patchUserPreference}
 
 // const getUsers = async (req, res, next) => {
 //     const data = await User.findAll({
