@@ -207,7 +207,6 @@ const patchUser = async (req, res, next) => {
         return res.status(404).send('Image not found');
         }
 
-        // Sort the matching files by modification time in descending order (newest to oldest)
         matchingFiles.sort((a, b) => {
         const aPath = path.join(folderPath, a);
         const bPath = path.join(folderPath, b);
@@ -216,10 +215,8 @@ const patchUser = async (req, res, next) => {
 
         console.log(matchingFiles)
 
-        // Get the filename of the latest (most recent) image
         const latestImage = matchingFiles[0];
 
-        // Delete all files in the folder except the latest one
         matchingFiles.forEach((file) => {
         if (file !== latestImage) {
             const filePath = path.join(folderPath, file);

@@ -27,7 +27,6 @@ const getUserImage = (req, res, next) => {
       return imageStream.pipe(res);
     }
 
-    // Sort the matching files by modification time in descending order (newest to oldest)
     matchingFiles.sort((a, b) => {
       const aPath = path.join(folderPath, a);
       const bPath = path.join(folderPath, b);
@@ -37,7 +36,6 @@ const getUserImage = (req, res, next) => {
     const newestImage = matchingFiles[0];
     const imagePath = path.join(folderPath, newestImage);
 
-    // Read the image file and send it in the response
     const imageStream = fs.createReadStream(imagePath);
 
     imageStream.on('error', (err) => {
@@ -71,7 +69,6 @@ const getItemImage = (req, res, next) => {
 
     const imagePath = path.join(folderPath, matchingFiles[0]);
 
-    // Read the image file and send it in the response
     const imageStream = fs.createReadStream(imagePath);
 
     imageStream.on('error', (err) => {

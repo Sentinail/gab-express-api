@@ -21,11 +21,9 @@ const webHook = async (request, response) => {
       const paymentIntentSucceeded = event.data.object;
       console.log(paymentIntentSucceeded);
 
-      // Retrieve the customer details using the customer ID from the payment intent
       const customer = await stripe.customers.retrieve(paymentIntentSucceeded.customer);
       console.log("Costumer:" + customer)
 
-      // Access the metadata from the Payment Intent
       const {item_name, quantity, price, place_to_deliver} = paymentIntentSucceeded.metadata;
       if (item_name && quantity && price && place_to_deliver) {
         const transaction_result = await Transaction.create({
@@ -49,12 +47,11 @@ const webHook = async (request, response) => {
       const result = await User.update({total_donation: total_donation}, {where: { email_address: customer.email }})
 
       break;
-    // ... handle other event types
+      
     default:
       console.log(`Unhandled event type ${event.type}`);
   }
 
-  // Return a 200 response to acknowledge receipt of the event
   response.send().end();
 };
 

@@ -12,7 +12,7 @@ const createCheckout = async (req, res, next) => {
     })
 
     const customer = await stripe.customers.create({
-      email: req.session.email_address, // Assuming you have the email in the request body
+      email: req.session.email_address,
     });
 
     const session = await stripe.checkout.sessions.create({
@@ -32,7 +32,7 @@ const createCheckout = async (req, res, next) => {
       ],
       success_url: `${process.env.CLIENT_SIDE_URL}/home`,
       cancel_url: `${process.env.CLIENT_SIDE_URL}/home`,
-      customer: customer.id, // Attach the customer ID to the payment intent
+      customer: customer.id,
       payment_intent_data: {
         metadata: {
           item_name: item_data.item_name,
