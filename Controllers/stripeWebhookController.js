@@ -1,5 +1,5 @@
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
-const endpointSecret = "whsec_d0c2180ff74ea5f0f4d0f1cbe726a785eb0d23425712a25f24440c1c931b6d9c";
+const endpointSecret = process.env.ENDPOINT_SECRET;
 const { User } = require("../Databases/MySQL_Model/users_model")
 const { Transaction } = require("../Databases/MySQL_Model/transactions_model")
 
