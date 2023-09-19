@@ -1,18 +1,6 @@
-const { Sequelize, DataTypes } = require("sequelize")
+const { DataTypes } = require("sequelize")
 
-const sequelize = new Sequelize('users', 'root', '', {
-    host: "localhost",
-    dialect: "mysql",
-    pool: {
-        max: 10,
-        min: 0,
-        acquire: 30000,
-        idle: 10000
-    },
-    define: {
-        paranoid: true
-    }
-})
+const sequelize = require("./connection")
 
 const User = sequelize.define('user_datas', {
     user_id: {

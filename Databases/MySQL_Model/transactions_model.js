@@ -1,18 +1,6 @@
-const { Sequelize, DataTypes } = require("sequelize")
+const { DataTypes } = require("sequelize")
 
-const sequelize = new Sequelize('transactions', 'root', '', {
-    host: "localhost",
-    dialect: "mysql",
-    pool: {
-        max: 10,
-        min: 0,
-        acquire: 30000,
-        idle: 10000
-    },
-    define: {
-        paranoid: true
-    }
-})
+const sequelize = require("./connection")
 
 const Transaction = sequelize.define('user_transactions', {
     id: {

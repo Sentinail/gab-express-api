@@ -5,10 +5,24 @@ const MongoStore = require("connect-mongo")
 const cookieParser = require("cookie-parser")
 require("dotenv").config()
 const { webHook } = require("./Controllers/stripeWebhookController")
+const mongoose = require('mongoose');
+
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+  
+mongoose.connection.on('connected', () => {
+    console.log('Connected to MongoDB Atlas');
+});
+
+mongoose.connection.on('error', (err) => {
+    console.error('MongoDB connection error:', err);
+});
 
 const app = express()
 
-app.use(cors({origin: [process.env.CLIENT_SIDE_URL, "https://gab-express.vercel.app"], credentials: true}))
+app.use(cors({origin: ["http://localhost:3000", process.env.CLIENT_SIDE_URL], credentials: true}))
 
 app.options('*', cors());
 
@@ -20,19 +34,36 @@ app.use(cookieParser())
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use(session({
-    secret: "secret",
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: 'mongodb://127.0.0.1:27017/myDatabase', collectionName: "session", }),
-    cookie: {
-        sameSite: "none",
-        secure: process.env.NODE_ENV === 'development' ? false : true,
-        httpOnly: process.env.NODE_ENV === 'development' ? false : true,
-        sameSite: process.env.NODE_ENV === 'development' ? false : 'none',
-        maxAge: 36000000
-    }
-}));
+app.use(
+    session({
+        secret: process.env.MONGODB_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        store: new MongoStore({
+            mongoUrl: process.env.MONGODB_URI,
+            collection: 'sessions',
+        }),
+        cookie: {
+            secure: process.env.NODE_ENV === 'development' ? false : true,
+            httpOnly: process.env.NODE_ENV === 'development' ? false : true,
+            sameSite: process.env.NODE_ENV === 'development' ? false : 'none',
+            maxAge: 36000000
+        }
+    })
+);
+
+// app.use(session({
+//     secret: "PgoHr0u5CMHJQ9fD",
+//     resave: false,
+//     saveUninitialized: false,
+//     store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI, collectionName: "session", }),
+//     cookie: {
+//         secure: process.env.NODE_ENV === 'development' ? false : true,
+//         httpOnly: process.env.NODE_ENV === 'development' ? false : true,
+//         sameSite: process.env.NODE_ENV === 'development' ? false : 'none',
+//         maxAge: 36000000
+//     }
+// }));
 
 app.enable("trust proxy")
 

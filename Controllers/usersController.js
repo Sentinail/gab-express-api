@@ -96,8 +96,6 @@ const logoutUser = (req, res, next) => {
     } catch (err) {
         res.status(400).json({message: err})
     }
-
-    
 }
 
 const sessionLogin = async (req, res, next) => {
