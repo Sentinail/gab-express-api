@@ -12,7 +12,7 @@ const createCheckout = async (req, res, next) => {
     })
 
     const customer = await stripe.customers.create({
-      email: req.session.email_address,
+      email: req.user.email_address,
     });
 
     const session = await stripe.checkout.sessions.create({

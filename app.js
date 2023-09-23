@@ -5,20 +5,21 @@ const MongoStore = require("connect-mongo")
 const cookieParser = require("cookie-parser")
 require("dotenv").config()
 const { webHook } = require("./Controllers/stripeWebhookController")
-const mongoose = require('mongoose');
 
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+// const mongoose = require('mongoose');
+
+// mongoose.connect(process.env.MONGODB_URI, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+//   });
   
-mongoose.connection.on('connected', () => {
-    console.log('Connected to MongoDB Atlas');
-});
+// mongoose.connection.on('connected', () => {
+//     console.log('Connected to MongoDB Atlas');
+// });
 
-mongoose.connection.on('error', (err) => {
-    console.error('MongoDB connection error:', err);
-});
+// mongoose.connection.on('error', (err) => {
+//     console.error('MongoDB connection error:', err);
+// });
 
 const app = express()
 
@@ -34,23 +35,23 @@ app.use(cookieParser())
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use(
-    session({
-        secret: process.env.MONGODB_SECRET,
-        resave: false,
-        saveUninitialized: false,
-        store: new MongoStore({
-            mongoUrl: process.env.MONGODB_URI,
-            collection: 'sessions',
-        }),
-        cookie: {
-            secure: process.env.NODE_ENV === 'development' ? false : true,
-            httpOnly: process.env.NODE_ENV === 'development' ? false : true,
-            sameSite: process.env.NODE_ENV === 'development' ? false : 'none',
-            maxAge: 36000000
-        }
-    })
-);
+// app.use(
+//     session({
+//         secret: process.env.MONGODB_SECRET,
+//         resave: false,
+//         saveUninitialized: false,
+//         store: new MongoStore({
+//             mongoUrl: process.env.MONGODB_URI,
+//             collection: 'sessions',
+//         }),
+//         cookie: {
+//             secure: process.env.NODE_ENV === 'development' ? false : true,
+//             httpOnly: process.env.NODE_ENV === 'development' ? false : true,
+//             sameSite: process.env.NODE_ENV === 'development' ? false : 'none',
+//             maxAge: 36000000
+//         }
+//     })
+// );
 
 // app.use(session({
 //     secret: "PgoHr0u5CMHJQ9fD",

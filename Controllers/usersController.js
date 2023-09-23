@@ -4,12 +4,14 @@ const bcrypt = require("bcrypt")
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
+var jwt = require('jsonwebtoken');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, "./Images/Gab-Express-User-Profile")
     },
     filename: function (req, file, cb) {
-        const uniqueSuffix = req.session.email_address + '-' + Date.now() + '-' + Math.round(Math.random() * 1e9);
+        console.log(req.user.email_address, "PATCH USER")
+        const uniqueSuffix = req.user.email_address + '-' + Date.now() + '-' + Math.round(Math.random() * 1e9);
         cb(null, uniqueSuffix + '-' + file.originalname);
     }
   });
@@ -18,11 +20,11 @@ const upload = multer({ storage: storage }).single("image")
 
 const patchUserPreference = async (req, res, next) => {
     try {
-        const email_address = req.session.email_address
+        const email_address = req.user.email_address
         const styleString = req.body.style
 
-        await User.update({color_preference: styleString}, {where: {email_address: email_address}})
-        res.send("Success")
+        const userPreference = await User.update({color_preference: styleString}, {where: {email_address: email_address}})
+        res.json({result: userPreference.color_preference})
 
     } catch (err) {
         res.send(err)
@@ -32,7 +34,7 @@ const patchUserPreference = async (req, res, next) => {
 
 const getUserPreference = async (req, res, next) => {
     try {
-        const email_address = req.session.email_address
+        const email_address = req.user.email_address
         console.log(email_address)
 
         if (email_address) {
@@ -57,7 +59,7 @@ const getUserPreference = async (req, res, next) => {
 
 
 const checkUserAccount = async (req, res, next) => {
-    if (!req.session.email_address) {
+    if (!req.user.email_address) {
         res.json({isAuth : false})
     } else {
         res.json({isAuth : true})
@@ -100,26 +102,18 @@ const logoutUser = (req, res, next) => {
 
 const sessionLogin = async (req, res, next) => {
     try {
-        const email_address = req.session.email_address
-        const password = req.session.password
-        if (email_address && password) {
+        if (req.user.email_address) {
             const user = await User.findOne({where: {
-                email_address: email_address
+                email_address: req.user.email_address
             }})
         
             if (!user) {
                 res.json({login: false, message: "User Not Found"})
             } else {
-        
-                const passwordIsMatch = password === user.password
-        
-                if (passwordIsMatch) {
-                    res.json({login: true, message: "User Login", user_data: user})
-                } else {
-                    res.json({login: false, message: "Incorrect Password"})
-                }
+                res.json({login: true, message: "User Login", user_data: user})
             }
-        } else {
+        }
+        else {
             res.json({login: false, message: "Invalid User Session Information"})
         }
     } catch (err) {
@@ -161,6 +155,7 @@ const postUser = async (req, res, next) => {
 const loginUser = async (req, res, next) => {
     try {
         const { email_address, password } = req.body
+        console.log(req.body)
         const user = await User.findOne({where: {
             email_address: email_address
         }})
@@ -172,10 +167,13 @@ const loginUser = async (req, res, next) => {
             const passwordIsMatch = await bcrypt.compare(password, user.password)
     
             if (passwordIsMatch) {
-                req.session.user_id = user.user_id
-                req.session.email_address = user.email_address
-                req.session.password = user.password
-                res.json({login: true, message: "User Login", user_data: user})
+                const token = jwt.sign(user.dataValues, process.env.JWT_SECRET, {
+                    expiresIn: "1d"
+                })
+
+                console.log(jwt.verify(token, process.env.JWT_SECRET))
+            
+                res.json({login: true, message: "User Login", user_data: user, token: token})
             } else {
                 res.json({login: false, message: "Incorrect Password"} )
             }
@@ -187,7 +185,7 @@ const loginUser = async (req, res, next) => {
 }
 
 const patchUser = async (req, res, next) => {
-    const email_address = req.session.email_address;
+    const email_address = req.user.email_address;
 
     const emailRegex = new RegExp(`^${email_address.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}-\\d+-(\\d+)-(.+)$`, 'i');
 
@@ -234,7 +232,7 @@ const patchUser = async (req, res, next) => {
             about_user: req.body.about_user
         }, {
             where: {
-                user_id: req.session.user_id
+                user_id: req.user.user_id
             }
         })
 
