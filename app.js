@@ -1,25 +1,9 @@
 const express = require("express")
-const session = require("express-session")
 const cors = require("cors")
-const MongoStore = require("connect-mongo")
 const cookieParser = require("cookie-parser")
 require("dotenv").config()
 const { webHook } = require("./Controllers/stripeWebhookController")
-
-// const mongoose = require('mongoose');
-
-// mongoose.connect(process.env.MONGODB_URI, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-//   });
-  
-// mongoose.connection.on('connected', () => {
-//     console.log('Connected to MongoDB Atlas');
-// });
-
-// mongoose.connection.on('error', (err) => {
-//     console.error('MongoDB connection error:', err);
-// });
+const path = require("path")
 
 const app = express()
 
@@ -34,6 +18,34 @@ app.use(express.json())
 app.use(cookieParser())
 
 app.use(express.urlencoded({ extended: true }));
+
+app.use(express.static(path.join(__dirname, 'build')));
+
+app.enable("trust proxy")
+
+app.use(express.static("Images/Gab-Express-User-Profile"))
+
+app.use(express.static("Images/Gab-Express-Food-Items"))
+
+app.use("/images", require("./Routes/get-images-route"))
+
+app.use("/users", require("./Routes/users-route"))
+
+app.use("/items", require("./Routes/items-route"))
+
+app.use("/create-checkout-session", require("./Routes/checkout-route"))
+
+app.use("/transactions", require("./Routes/get-transactions-route"))
+
+app.get("*", (req, res, next) => {
+    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+})
+
+const port = 9000
+
+app.listen(port, () => {
+    console.log(`Listening on Port: ${port}`)
+})
 
 // app.use(
 //     session({
@@ -66,38 +78,21 @@ app.use(express.urlencoded({ extended: true }));
 //     }
 // }));
 
-app.enable("trust proxy")
-
-app.use(express.static("Images/Gab-Express-User-Profile"))
-
-app.use(express.static("Images/Gab-Express-Food-Items"))
-
 // app.use("/user-images", express.static("Images/Gab-Express-User-Profile"))
 
 // app.use("/food-item-images", express.static("Images/Gab-Express-Food-Items"))
 
-app.use("/images", require("./Routes/get-images-route"))
+// const mongoose = require('mongoose');
 
-app.use("/users", require("./Routes/users-route"))
+// mongoose.connect(process.env.MONGODB_URI, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+//   });
+  
+// mongoose.connection.on('connected', () => {
+//     console.log('Connected to MongoDB Atlas');
+// });
 
-app.use("/items", require("./Routes/items-route"))
-
-app.use("/create-checkout-session", require("./Routes/checkout-route"))
-
-app.use("/transactions", require("./Routes/get-transactions-route"))
-
-app.use("/home-page-of-this-uhmmmm-api-i-guess", express.static("Public"))
-
-app.get("/", (req, res) => {
-    res.redirect("home-page-of-this-uhmmmm-api-i-guess")
-})
-
-app.use("*", (req, res, next) => {
-    res.send("404")
-})
-
-const port = 9000
-
-app.listen(port, () => {
-    console.log(`Listening on Port: ${port}`)
-})
+// mongoose.connection.on('error', (err) => {
+//     console.error('MongoDB connection error:', err);
+// });
