@@ -1,5 +1,5 @@
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
-const endpointSecret = process.env.ENDPOINT_SECRET;
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 const { User } = require("../Databases/MySQL_Model/users_model")
 const { Transaction } = require("../Databases/MySQL_Model/transactions_model")
 
