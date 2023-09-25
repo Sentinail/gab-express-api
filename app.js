@@ -43,6 +43,10 @@ app.get("/", (req, res, next) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 })
 
+app.get("/testenv", (req, res, next) => {
+    res.send("I'm just testing : " + process.env.TEST_ENV)
+})
+
 const port = 9000
 
 app.listen(port, () => {
