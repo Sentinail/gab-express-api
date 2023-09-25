@@ -27,9 +27,11 @@ app.use(express.static("Images/Gab-Express-User-Profile"))
 
 app.use(express.static("Images/Gab-Express-Food-Items"))
 
+app.use(express.static('Public'))
+
 app.use("/images", require("./Routes/get-images-route"))
 
-app.use("/users", require("./Routes/users-route"))
+app.use("/users", require("./Routes/users-route"))  
 
 app.use("/items", require("./Routes/items-route"))
 
@@ -37,8 +39,8 @@ app.use("/create-checkout-session", require("./Routes/checkout-route"))
 
 app.use("/transactions", require("./Routes/get-transactions-route"))
 
-app.get("*", (req, res, next) => {
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+app.get("/", (req, res, next) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 })
 
 const port = 9000
